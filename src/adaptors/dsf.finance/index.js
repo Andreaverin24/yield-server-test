@@ -1,4 +1,4 @@
-const ADDRESSES = require('../helper/coreAssets.json');
+const sdk = require('@defillama/sdk');
 const utils = require('../utils');
 
 const dsfPoolStables = '0x22586ea4fdaa9ef012581109b336f0124530ae69';
@@ -8,13 +8,9 @@ const abi = {
 };
 
 const collectPools = async () => {
-  const tvl = await api.call({
-    abi: abi.totalHoldings, // Убедитесь, что функция `totalHoldings` в ABI возвращает общее значение TVL
-    target: dsfPoolStables,
-  });
   
-  const data = await utils.getData('https://api2.dsf.finance/api/total-apy-tvl');
-  const info = data['data']['info'];
+  const tvl = await getTVL(dsfPoolStables);
+  const apyData = await getAPYFromAPI();
 
   return [
     {
@@ -23,7 +19,7 @@ const collectPools = async () => {
       project: 'dsf.finance',
       symbol: 'USDT-USDC-DAI',
       tvlUsd: tvl / 1e18,
-      apy: info['apy'],
+      apy: apyData.apy,
       rewardTokens: null,
       underlyingTokens: [
         '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
@@ -34,6 +30,22 @@ const collectPools = async () => {
     }
   ];
 };
+
+async function getTVL(contractAddress) {
+  const tvlResponse = await sdk.api.abi.call({
+    target: contractAddress,
+    abi: abi.totalHoldings,
+    chain: 'ethereum',
+  });
+  const totalHoldings = tvlResponse.output;
+  return totalHoldings;
+}
+
+async function getAPYFromAPI() {
+  const data = await utils.getData('https://api2.dsf.finance/api/total-apy-tvl');
+  const info = data['data']['info'];
+  return { apy: info['apy'] };
+}
 
 module.exports = {
   timetravel: false,
