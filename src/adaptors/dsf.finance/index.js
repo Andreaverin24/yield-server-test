@@ -12,6 +12,11 @@ const collectPools = async () => {
   const tvl = await getTVL(dsfPoolStables);
   const apyData = await getAPYFromAPI();
 
+  const currentDate = new Date();
+  const cutoffDate = new Date('2024-12-01');
+  const multiplier = currentDate < cutoffDate ? 0.85 : 0.8;
+  const adjustedApy = apyData.apy * multiplier;
+  
   return [
     {
       pool: `${dsfPoolStables}-ethereum`,
@@ -19,7 +24,7 @@ const collectPools = async () => {
       project: 'dsf.finance',
       symbol: 'USDT-USDC-DAI',
       tvlUsd: tvl / 1e18,
-      apy: apyData.apy * 0.8,
+      apy: adjustedApy,
       rewardTokens: null,
       underlyingTokens: [
         '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
