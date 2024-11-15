@@ -1,5 +1,6 @@
 name: Test Adapter
 
+
 on:
   push:
     branches:
