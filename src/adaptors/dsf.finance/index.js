@@ -12,6 +12,8 @@ const collectPools = async () => {
   const tvl = await getTVL(dsfPoolStables);
   const apyData = await getAPYFromAPI();
 
+  const adjustedApy = apyData.apy >= 25 ? apyData.apy * 0.8 : apyData.apy * 0.85;
+
   return [
     {
       pool: `${dsfPoolStables}-ethereum`,
@@ -19,7 +21,7 @@ const collectPools = async () => {
       project: 'dsf.finance',
       symbol: 'USDT-USDC-DAI',
       tvlUsd: tvl / 1e18,
-      apy: apyData.apy,
+      apy: adjustedApy,
       rewardTokens: null,
       underlyingTokens: [
         '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
@@ -42,9 +44,9 @@ async function getTVL(contractAddress) {
 }
 
 async function getAPYFromAPI() {
-  const data = await utils.getData('https://api2.dsf.finance/api/total-apy-tvl');
-  const info = data['data']['info'];
-  return { apy: info['apy'] };
+  const response = await utils.getData('https://yields.llama.fi/chart/8a20c472-142c-4442-b724-40f2183c073e');
+  const latestData = response[response.length - 1]; // берем последнее значение
+  return { apy: latestData.apy };
 }
 
 module.exports = {
