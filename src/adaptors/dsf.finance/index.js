@@ -47,9 +47,18 @@ async function getTVL(contractAddress) {
 }
 
 async function getAPYFromAPI() {
-  const response = await utils.getData('https://yields.llama.fi/chart/8a20c472-142c-4442-b724-40f2183c073e');
-  const latestData = response[response.length - 1]; // берем последнее значение
-  return { apy: latestData.apy };
+  try {
+    const response = await utils.getData('https://yields.llama.fi/chart/8a20c472-142c-4442-b724-40f2183c073e');
+    if (response && response.status === 'success' && response.data && response.data.length > 0) {
+      const latestData = response.data[response.data.length - 1];
+      return { apy: latestData.apy };
+    } else {
+      throw new Error('API response is empty or undefined');
+    }
+  } catch (error) {
+    console.error('Error fetching APY data:', error);
+    return { apy: 0 };
+  }
 }
 
 module.exports = {
