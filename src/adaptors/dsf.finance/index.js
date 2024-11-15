@@ -1,8 +1,11 @@
 const ADDRESSES = require('../helper/coreAssets.json');
-const abi = require('./abi.json');
 const utils = require('../utils');
 
 const dsfPoolStables = '0x22586ea4fdaa9ef012581109b336f0124530ae69';
+
+const abi = {
+  totalHoldings: "uint256:totalHoldings"
+};
 
 const collectPools = async () => {
   const tvl = await api.call({
