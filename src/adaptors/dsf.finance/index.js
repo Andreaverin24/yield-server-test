@@ -12,8 +12,6 @@ const collectPools = async () => {
   const tvl = await getTVL(dsfPoolStables);
   const apyData = await getAPYFromAPI();
 
-  const adjustedApy = apyData.apy >= 25 ? apyData.apy * 0.8 : apyData.apy * 0.85;
-
   return [
     {
       pool: `${dsfPoolStables}-ethereum`,
@@ -21,7 +19,7 @@ const collectPools = async () => {
       project: 'dsf.finance',
       symbol: 'USDT-USDC-DAI',
       tvlUsd: tvl / 1e18,
-      apy: adjustedApy,
+      apy: apyData.apy * 0.8,
       rewardTokens: null,
       underlyingTokens: [
         '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
